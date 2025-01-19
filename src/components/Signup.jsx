@@ -1,17 +1,21 @@
+import { useActionState } from "react";
+
 import {
   isEmail,
   isNotEmpty,
   isEqualToOtherValue,
   hasMinLength,
-} from "../util/validation";
+} from "../util/validation.js";
+
 export default function Signup() {
-  function signupAction(formData) {
+  function signupAction(prevFormData, formData) {
     const email = formData.get("email");
     const password = formData.get("password");
     const confirmPassword = formData.get("confirm-password");
     const firstName = formData.get("first-name");
     const lastName = formData.get("last-name");
     const role = formData.get("role");
+    const terms = formData.get("terms");
     const acquisitionChannel = formData.getAll("acquisition");
 
     let errors = [];
@@ -52,8 +56,12 @@ export default function Signup() {
     return { errors: null };
   }
 
+  const [formState, formAction] = useActionState(signupAction, {
+    errors: null,
+  });
+
   return (
-    <form action={signupAction}>
+    <form action={formAction}>
       <h2>Welcome on board!</h2>
       <p>We just need a little bit of data from you to get you started 🚀</p>
 
@@ -137,6 +145,14 @@ export default function Signup() {
           agree to the terms and conditions
         </label>
       </div>
+
+      {formState.errors && (
+        <ul className="error">
+          {formState.errors.map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      )}
 
       <p className="form-actions">
         <button type="reset" className="button button-flat">
